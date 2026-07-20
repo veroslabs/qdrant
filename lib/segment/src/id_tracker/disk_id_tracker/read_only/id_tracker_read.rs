@@ -4,7 +4,7 @@ use common::bitvec::BitSlice;
 use common::generic_consts::{Random, Sequential};
 use common::iterator_ext::IteratorExt as _;
 use common::types::{DeferredBehavior, PointOffsetType};
-use common::universal_io::{ReadRange, UniversalRead};
+use common::universal_io::{ReadRange, UioResult, UniversalRead};
 use itertools::Itertools as _;
 
 use super::ReadOnlyDiskIdTracker;
@@ -108,11 +108,11 @@ impl<S: UniversalRead> IdTrackerRead for ReadOnlyDiskIdTracker<S> {
                 (internal_id, range)
             });
         self.versions
-            .read_batch::<Random, PointOffsetType>(ranges, |internal_id, values| {
+            .read_batch::<Random, PointOffsetType, _>(ranges, |internal_id, values| {
                 if let Some(&version) = values.first() {
                     callback(internal_id, version);
                 }
-                Ok(())
+                UioResult::Ok(())
             })?;
 
         Ok(())
