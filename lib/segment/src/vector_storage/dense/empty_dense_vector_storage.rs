@@ -191,6 +191,8 @@ impl VectorStorage for EmptyDenseVectorStorage {
 
 #[cfg(test)]
 mod tests {
+    use common::generic_consts::Random;
+
     use super::*;
 
     #[test]
@@ -218,16 +220,8 @@ mod tests {
         assert!(storage.multi_vector_config().is_none());
 
         // get_vector_opt always returns None
-        assert!(
-            storage
-                .get_vector_opt::<common::generic_consts::Random>(0)
-                .is_none()
-        );
-        assert!(
-            storage
-                .get_vector_opt::<common::generic_consts::Random>(500)
-                .is_none()
-        );
+        assert!(storage.get_vector_opt::<Random>(0).is_none());
+        assert!(storage.get_vector_opt::<Random>(500).is_none());
     }
 
     #[test]
