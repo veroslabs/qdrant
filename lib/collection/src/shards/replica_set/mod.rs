@@ -15,6 +15,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Duration;
 
+use arc_swap::ArcSwap;
 use common::budget::ResourceBudget;
 use common::counter::hardware_accumulator::HwMeasurementAcc;
 use common::rate_limiting::RateLimiter;
@@ -107,7 +108,7 @@ pub struct ShardReplicaSet {
     channel_service: ChannelService,
     collection_id: CollectionId,
     collection_config: Arc<RwLock<CollectionConfigInternal>>,
-    optimizers_config: OptimizersConfig,
+    optimizers_config: ArcSwap<OptimizersConfig>,
     pub(crate) shared_storage_config: Arc<SharedStorageConfig>,
     payload_index_schema: Arc<SaveOnDisk<PayloadIndexSchema>>,
     update_runtime: Handle,
@@ -219,7 +220,7 @@ impl ShardReplicaSet {
             channel_service,
             collection_id,
             collection_config,
-            optimizers_config: effective_optimizers_config,
+            optimizers_config: ArcSwap::from_pointee(effective_optimizers_config),
             shared_storage_config,
             payload_index_schema,
             update_runtime,
@@ -361,7 +362,7 @@ impl ShardReplicaSet {
             channel_service,
             collection_id,
             collection_config,
-            optimizers_config: effective_optimizers_config,
+            optimizers_config: ArcSwap::from_pointee(effective_optimizers_config),
             shared_storage_config,
             payload_index_schema,
             update_runtime,
@@ -618,7 +619,7 @@ impl ShardReplicaSet {
             self.update_runtime.clone(),
             self.search_runtime.clone(),
             self.optimizer_resource_budget.clone(),
-            self.optimizers_config.clone(),
+            self.optimizers_config.load().as_ref().clone(),
         )
         .await;
 
@@ -844,7 +845,7 @@ impl ShardReplicaSet {
                     self.update_runtime.clone(),
                     self.search_runtime.clone(),
                     self.optimizer_resource_budget.clone(),
-                    self.optimizers_config.clone(),
+                    self.optimizers_config.load().as_ref().clone(),
                 )
                 .await?;
 
@@ -898,10 +899,17 @@ impl ShardReplicaSet {
     /// ## Cancel safety
     ///
     /// This function is **not** cancel safe.
-    pub(crate) async fn on_optimizer_config_update(&self) -> CollectionResult<()> {
+    pub(crate) async fn on_optimizer_config_update(
+        &self,
+        effective_optimizers_config: OptimizersConfig,
+    ) -> CollectionResult<()> {
         let read_local = self.local.read().await;
+        self.optimizers_config
+            .store(Arc::new(effective_optimizers_config.clone()));
         if let Some(shard) = &*read_local {
-            shard.on_optimizer_config_update().await
+            shard
+                .on_optimizer_config_update(&effective_optimizers_config)
+                .await
         } else {
             Ok(())
         }

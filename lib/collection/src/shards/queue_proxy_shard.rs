@@ -33,6 +33,7 @@ use crate::operations::types::{
     OptimizersStatus, PointRequestInternal, ScrollRequestInternal, UpdateResult,
 };
 use crate::operations::universal_query::shard_query::{ShardQueryRequest, ShardQueryResponse};
+use crate::optimizers_builder::OptimizersConfig;
 use crate::shards::local_shard::LocalShard;
 use crate::shards::shard_trait::ShardOperation;
 use crate::shards::telemetry::LocalShardTelemetry;
@@ -176,10 +177,13 @@ impl QueueProxyShard {
         self.inner_unchecked().transfer_all_missed_updates().await
     }
 
-    pub async fn on_optimizer_config_update(&self) -> CollectionResult<()> {
+    pub async fn on_optimizer_config_update(
+        &self,
+        effective_optimizers_config: &OptimizersConfig,
+    ) -> CollectionResult<()> {
         self.inner_unchecked()
             .wrapped_shard
-            .on_optimizer_config_update()
+            .on_optimizer_config_update(effective_optimizers_config)
             .await
     }
 
