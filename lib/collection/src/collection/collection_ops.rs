@@ -296,11 +296,12 @@ impl Collection {
     /// This function is cancel safe, and will always run to completion.
     pub async fn recreate_optimizers_blocking(&self) -> CollectionResult<()> {
         let shards_holder = self.shards_holder.clone();
+        let effective_optimizers_config = self.effective_optimizers_config().await?;
         tokio::task::spawn(async move {
             let shard_holder = shards_holder.read().await;
-            let updates = shard_holder
-                .all_shards()
-                .map(|replica_set| replica_set.on_optimizer_config_update());
+            let updates = shard_holder.all_shards().map(|replica_set| {
+                replica_set.on_optimizer_config_update(effective_optimizers_config.clone())
+            });
             future::try_join_all(updates).await
         })
         .await??;

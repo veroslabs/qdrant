@@ -725,6 +725,33 @@ mod tests {
         assert_eq!(rs.highest_alive_replica_peer_id(), Some(4));
     }
 
+    #[tokio::test]
+    async fn test_new_local_shard_uses_updated_effective_optimizer_config() {
+        let collection_dir = Builder::new().prefix("test_collection").tempdir().unwrap();
+        let rs = new_shard_replica_set(&collection_dir).await;
+        let mut effective_optimizers_config = TEST_OPTIMIZERS_CONFIG.clone();
+        effective_optimizers_config.max_optimization_threads = Some(1);
+
+        rs.on_optimizer_config_update(effective_optimizers_config)
+            .await
+            .unwrap();
+        rs.init_empty_local_shard().await.unwrap();
+
+        let local = rs.local.read().await;
+        let Some(Shard::Local(local_shard)) = local.as_ref() else {
+            panic!("expected a local shard");
+        };
+        let max_threads = local_shard
+            .update_handler
+            .lock()
+            .await
+            .max_optimization_threads;
+        drop(local);
+        rs.stop_gracefully().await;
+
+        assert_eq!(max_threads, Some(1));
+    }
+
     const TEST_OPTIMIZERS_CONFIG: OptimizersConfig = OptimizersConfig {
         deleted_threshold: 0.9,
         vacuum_min_vector_number: 1000,

@@ -36,6 +36,7 @@ use crate::operations::{
     CollectionUpdateOperations, CreateIndex, FieldIndexOperations, OperationToShard,
     OperationWithClockTag, SplitByShard as _,
 };
+use crate::optimizers_builder::OptimizersConfig;
 use crate::shards::local_shard::LocalShard;
 use crate::shards::remote_shard::RemoteShard;
 use crate::shards::shard_trait::ShardOperation;
@@ -347,8 +348,13 @@ impl ForwardProxyShard {
         self.wrapped_shard.snapshot_manifest().await
     }
 
-    pub async fn on_optimizer_config_update(&self) -> CollectionResult<()> {
-        self.wrapped_shard.on_optimizer_config_update().await
+    pub async fn on_optimizer_config_update(
+        &self,
+        effective_optimizers_config: &OptimizersConfig,
+    ) -> CollectionResult<()> {
+        self.wrapped_shard
+            .on_optimizer_config_update(effective_optimizers_config)
+            .await
     }
 
     pub async fn on_strict_mode_config_update(&mut self) {
