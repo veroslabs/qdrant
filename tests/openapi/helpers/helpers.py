@@ -7,6 +7,7 @@ import warnings
 from schemathesis.core.failures import Failure, FailureGroup
 from schemathesis.schemas import APIOperation
 from schemathesis.specs.openapi.schemas import OpenApiSchema
+from schemathesis.specs.openapi.checks import content_type_conformance, response_schema_conformance
 from functools import lru_cache
 
 from .settings import QDRANT_HOST, SCHEMA, QDRANT_HOST_HEADERS
@@ -70,7 +71,9 @@ def request_with_validation(
     )
     duration = time.time() - start_time
     try:
-        operation.validate_response(response)
+        operation.Case(path_parameters=path_params, query=query_params).validate_response(
+            response, checks=[content_type_conformance, response_schema_conformance]
+        )
     except (Failure, FailureGroup) as ex:
         status = response.status_code
         headers_str = "\n".join(f"{k}: {v}" for k, v in response.headers.items())

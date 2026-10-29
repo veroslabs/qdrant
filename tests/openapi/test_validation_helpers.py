@@ -9,13 +9,13 @@ from schemathesis.core.failures import Failure, FailureGroup
 from .helpers import helpers
 
 
-def response(payload):
+def response(payload, content_type='application/json'):
     value = requests.Response()
     value.status_code = 200
-    value.headers['Content-Type'] = 'application/json'
-    value._content = json.dumps(payload).encode()
+    value.headers['Content-Type'] = content_type
+    value._content = payload if isinstance(payload, bytes) else json.dumps(payload).encode()
     from urllib3.response import HTTPResponse
-    value.raw = HTTPResponse(headers={'Content-Type': 'application/json'})
+    value.raw = HTTPResponse(headers={'Content-Type': content_type})
     value.request = requests.Request('GET', 'http://localhost:6333/collections').prepare()
     return value
 
@@ -31,6 +31,25 @@ def test_invalid_response_is_rejected(monkeypatch):
     with pytest.warns(UserWarning, match='Failed validation'):
         with pytest.raises((Failure, FailureGroup)):
             helpers.request_with_validation('/collections', 'GET')
+
+
+def test_undocumented_json_media_type_is_rejected(monkeypatch):
+    monkeypatch.setattr(helpers.requests, 'get',
+                        lambda **kwargs: response({'result': 123}, 'application/problem+json'))
+    with pytest.warns(UserWarning, match='Failed validation'):
+        with pytest.raises((Failure, FailureGroup)):
+            helpers.request_with_validation('/collections', 'GET')
+
+
+@pytest.mark.parametrize('api,params,media_type,body', [
+    ('/metrics', {}, 'text/plain', b'app_info 1\n'),
+    ('/snapshots/{snapshot_name}', {'snapshot_name': 'owned'},
+     'application/octet-stream', b'\x00\xffsnapshot'),
+])
+def test_documented_non_json_responses_remain_valid(monkeypatch, api, params, media_type, body):
+    expected = response(body, media_type)
+    monkeypatch.setattr(helpers.requests, 'get', lambda **kwargs: expected)
+    assert helpers.request_with_validation(api, 'GET', params) is expected
 
 
 def test_invalid_body_rejected_before_http(monkeypatch):
