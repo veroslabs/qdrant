@@ -1,0 +1,18 @@
+{
+  "release.toml": "136f412aa01471177b5ee5c06dea3071b416fdc70b2297783379d1b436c529d6",
+  "Cargo.toml": "33b873e2cda1e45559edfa8f91e4a68dd41328278b505b783c4602a415b6b0ae",
+  "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+  "CHANGELOG.md": "662eefb562e83e8ee89a71b57e2f3eee4d890417e060ac1cccc83fed0626df12",
+  "README.md": "aa19695356dd679224bafae9af23ef98f79a906a2a553398f282a6091672d86c",
+  ".gitignore": "b36827be4acb680ef92f9576ee14645d1e7b0c20cbf5f76f813b7571272872f9",
+  "Cargo.toml.orig": "be6041c66589f7dd5c2f6b6601402242cf5b12a5a1cfd7a14f2770dd0c1fcddd",
+  ".travis.yml": "6c4df4285ef26f7965b8604ef2bc247fcf33918619d5f17f7852b9dbf9d97b95",
+  "tests/feistel_network.rs": "7432f1b5943318f4635b306283665630eddac159cb7ba463f3eac10b2c6ca984",
+  "tests/randomness.rs": "3f7fa44bc6ca40a0601201e158f5150881b3c6bfd8e6f3486b57ccf26e36eb02",
+  "tests/permutor.rs": "245b79c12e136ba8f8c5587dbc83728d95295ddbf37bb4f386913349bfbef0b1",
+  "examples/deterministic.rs": "d57db8746f488fc2f9a67fd1dca8bddad27ce3ec6dd2a48e75275071e15bf502",
+  "examples/simple.rs": "c844fe408701a2d1504ae22acb54208fa1a9eb06df5a5f5c40ef6eb10e080b49",
+  "examples/random_pair.rs": "4bfd5f85e5fd4d5f7745b668a4b99dc51527418577d5706415f96917447f6354",
+  "benches/medium.rs": "18c33d8b9f00b20f8a0018585882d15c287c65b31c87130b6a7529ef1fec5dd1",
+  "src/lib.rs": "6eb0816ee4e8bf14891f7fa26db035c6ef242ef75ab6910fd5d285e7a10b633b"
+}

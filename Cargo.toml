@@ -312,6 +312,8 @@ dashmap = "6.2"
 walkdir = "2.5.0"
 
 [patch.crates-io]
+# Published 0.1.2 algorithm retained; only its vulnerable rand dependency is updated.
+permutation_iterator = { path = "vendor/permutation_iterator" }
 tonic = { git = "https://github.com/qdrant/tonic", branch = "v0.14.6-qdrant" }
 
 [[bin]]
