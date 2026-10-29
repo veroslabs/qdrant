@@ -2,13 +2,11 @@ import pytest
 import json
 import time
 from typing import Any, Dict, List
-import jsonschema
 import requests
 import warnings
-from schemathesis.exceptions import CheckFailed
-from schemathesis.models import APIOperation
-from schemathesis.specs.openapi.references import ConvertingResolver
-from schemathesis.specs.openapi.schemas import OpenApi30
+from schemathesis.core.failures import Failure, FailureGroup
+from schemathesis.schemas import APIOperation
+from schemathesis.specs.openapi.schemas import OpenApiSchema
 from functools import lru_cache
 
 from .settings import QDRANT_HOST, SCHEMA, QDRANT_HOST_HEADERS
@@ -22,22 +20,6 @@ def get_api_string(host, api, path_params):
     return f"{host}{api}".format(**path_params)
 
 
-def validate_schema(data, operation_schema: OpenApi30, raw_definitions):
-    """
-    :param data: concrete values to validate
-    :param operation_schema: operation schema
-    :param raw_definitions: definitions to check data with
-    :return:
-    """
-    resolver = ConvertingResolver(
-        operation_schema.location or "",
-        operation_schema.raw_schema,
-        nullable_name=operation_schema.nullable_name,
-        is_response_schema=False
-    )
-    jsonschema.validate(data, raw_definitions, cls=jsonschema.Draft7Validator, resolver=resolver)
-
-
 def request_with_validation(
         api: str,
         method: str,
@@ -47,14 +29,10 @@ def request_with_validation(
 ) -> requests.Response:
     operation: APIOperation = SCHEMA[api][method]
 
-    assert isinstance(operation.schema, OpenApi30)
+    assert isinstance(operation.schema, OpenApiSchema)
 
     if body:
-        validate_schema(
-            data=body,
-            operation_schema=operation.schema,
-            raw_definitions=operation.definition.raw['requestBody']['content']['application/json']['schema']
-        )
+        next(param for param in operation.body.items if param.media_type == "application/json").validate(body)
 
     if path_params is None:
         path_params = {}
@@ -93,7 +71,7 @@ def request_with_validation(
     duration = time.time() - start_time
     try:
         operation.validate_response(response)
-    except CheckFailed as ex:
+    except (Failure, FailureGroup) as ex:
         status = response.status_code
         headers_str = "\n".join(f"{k}: {v}" for k, v in response.headers.items())
         body_text = response.text.strip()
