@@ -1,0 +1,36 @@
+[package]
+name = "permutation_iterator"
+version = "0.1.2"
+edition = "2018"
+authors = ["Asim Ihsan <asim.ihsan@gmail.com>"]
+
+description = """
+A Rust library for iterating over random permutations using O(1) (i.e. constant) space.
+"""
+keywords = ["permutation", "permute", "random"]
+categories = ["algorithms"]
+documentation = "https://docs.rs/permutation-iterator-rs/"
+repository = "https://github.com/asimihsan/permutation-iterator-rs"
+homepage = "https://github.com/asimihsan/permutation-iterator-rs"
+readme = "README.md"
+license = "Apache-2.0"
+
+[badges]
+travis-ci = { repository = "asimihsan/permutation-iterator-rs", branch = "master" }
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bench]]
+name = "medium"
+
+# To use these `cargo install cargo-template-ci` then run `cargo template-ci`. This will generate Travis config for you.
+[package.metadata.template_ci]
+dist = "bionic"
+versions = ["stable", "beta", "nightly"]
+clippy = { allow_failure = false }
+rustfmt = { allow_failure = false }
+bench = { run = true }
+
+[dependencies]
+blake2-rfc = "0.2.18"
+rand = "0.7.2"
