@@ -8,4 +8,5 @@ GEMINI.md                         @veroslabs/agent-config-owners
 .cursor/                          @veroslabs/agent-config-owners
 /.github/copilot-instructions.md  @veroslabs/agent-config-owners
 /.github/workflows/               @veroslabs/agent-config-owners
+/.github/actions/                 @veroslabs/agent-config-owners
 /.github/CODEOWNERS               @veroslabs/agent-config-owners
