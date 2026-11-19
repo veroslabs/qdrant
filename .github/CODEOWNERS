@@ -1,6 +1,11 @@
 # Agent config and CI workflows need review from agent-config-owners (VER-209).
-.claude/             @veroslabs/agent-config-owners
-CLAUDE.md            @veroslabs/agent-config-owners
-AGENTS.md            @veroslabs/agent-config-owners
-/.github/workflows/  @veroslabs/agent-config-owners
-/.github/CODEOWNERS  @veroslabs/agent-config-owners
+.claude/                          @veroslabs/agent-config-owners
+CLAUDE.md                         @veroslabs/agent-config-owners
+CLAUDE.local.md                   @veroslabs/agent-config-owners
+AGENTS.md                         @veroslabs/agent-config-owners
+GEMINI.md                         @veroslabs/agent-config-owners
+.mcp.json                         @veroslabs/agent-config-owners
+.cursor/                          @veroslabs/agent-config-owners
+/.github/copilot-instructions.md  @veroslabs/agent-config-owners
+/.github/workflows/               @veroslabs/agent-config-owners
+/.github/CODEOWNERS               @veroslabs/agent-config-owners
