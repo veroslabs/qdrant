@@ -1,0 +1,6 @@
+# Agent config and CI workflows need review from agent-config-owners (VER-209).
+.claude/             @veroslabs/agent-config-owners
+CLAUDE.md            @veroslabs/agent-config-owners
+AGENTS.md            @veroslabs/agent-config-owners
+/.github/workflows/  @veroslabs/agent-config-owners
+/.github/CODEOWNERS  @veroslabs/agent-config-owners
